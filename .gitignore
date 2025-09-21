@@ -1,0 +1,9 @@
+# Ignore binaries and objects from the build
+*/bin
+*/obj
+*.dll
+*.pdb
+
+# Ignore bindings but keep the directory
+*/bindings/*
+!*/bindings/.gitkeep

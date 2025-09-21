@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>PluginBindings</RootNamespace>
+    <NoWarn>CS1591</NoWarn>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Plugin.Wasm/Plugin.Wasm.csproj" />
+  </ItemGroup>
+
+  <Target Name="Clean Bindings" AfterTargets="Clean">
+    <RemoveDir Directories="bindings" />
+    <MakeDir Directories="bindings" />
+  </Target>
+
+  <Target Name="ILRepack" AfterTargets="Build">
+    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
+    <Exec
+      Command="dotnet tool run ilrepack /out:Plugin.Wasm.dll /lib:$(ResonitePath) bin/$(Configuration)/$(TargetFramework)/Plugin.Wasm.dll bin/$(Configuration)/$(TargetFramework)/$(AssemblyTitle).dll" />
+  </Target>
+
+  <Target Name="Install" AfterTargets="ILRepack">
+    <!-- <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ResonitePath)Plugins" /> -->
+    <Copy SourceFiles="Plugin.Wasm.dll" DestinationFolder="$(ResonitePath)Plugins" />
+  </Target>
+</Project>
