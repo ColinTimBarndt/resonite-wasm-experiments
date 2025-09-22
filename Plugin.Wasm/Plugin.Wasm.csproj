@@ -46,6 +46,7 @@
       <GeneratedFiles Include="../Plugin.Wasm.ProtoFluxBindings/**/*.cs" />
       <GeneratedWasmFiles Include="../Plugin.Wasm.ProtoFluxBindings/bindings/Plugin/Wasm/**/*.cs" />
       <GeneratedFiles Remove="@(GeneratedWasmFiles)" />
+      <GeneratedFiles Remove="../Plugin.Wasm.ProtoFluxBindings/bindings/*.cs" />
     </ItemGroup>
 
     <Delete Files="@(GeneratedFiles)" />
