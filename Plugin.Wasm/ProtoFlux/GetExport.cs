@@ -2,7 +2,7 @@ using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 
 namespace Plugin.Wasm.ProtoFlux;
-/*
+
 [NodeCategory("Wasm")]
 [NodeName("Get Export", false)]
 public class GetExport : ExecutionNode<ExecutionContext>
@@ -34,4 +34,4 @@ public class GetExport : ExecutionNode<ExecutionContext>
         }, context);
         Export.Write(export, context);
     }
-}*/
+}

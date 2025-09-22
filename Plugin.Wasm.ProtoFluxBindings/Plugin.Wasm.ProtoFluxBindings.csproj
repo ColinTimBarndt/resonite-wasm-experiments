@@ -23,5 +23,6 @@
   <Target Name="Install" AfterTargets="ILRepack">
     <!-- <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ResonitePath)Plugins" /> -->
     <Copy SourceFiles="Plugin.Wasm.dll" DestinationFolder="$(ResonitePath)Plugins" />
+    <Copy SourceFiles="Plugin.Wasm.pdb" DestinationFolder="$(ResonitePath)Plugins" />
   </Target>
 </Project>

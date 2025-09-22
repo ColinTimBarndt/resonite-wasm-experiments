@@ -7,7 +7,7 @@ using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 
 namespace Plugin.Wasm.ProtoFlux;
-/*
+
 [NodeCategory("Wasm")]
 [NodeName("Load File", false)]
 public class LoadFile : AsyncActionNode<FrooxEngineContext>
@@ -38,4 +38,4 @@ public class LoadFile : AsyncActionNode<FrooxEngineContext>
             return OnFailed.Target;
         }
     }
-}*/
+}

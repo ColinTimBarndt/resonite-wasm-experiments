@@ -1,6 +1,5 @@
 namespace Plugin.Wasm;
 
-/*
 public static class WasmEngineProvider
 {
     /// <summary>
@@ -8,4 +7,4 @@ public static class WasmEngineProvider
     /// </summary>
     /// <remarks>https://docs.rs/wasmtime/latest/wasmtime/struct.Engine.html</remarks>
     public static Wasmtime.Engine Engine { get; } = new();
-}*/
+}

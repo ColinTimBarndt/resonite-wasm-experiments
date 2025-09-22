@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Elements.Assets;
 using FrooxEngine;
@@ -9,16 +8,15 @@ namespace Plugin.Wasm;
 /// Provides a statically loaded WebAssembly module asset.
 /// </summary>
 [Category(["Assets"])]
-public sealed class StaticWebAssemblyModule : StaticAssetProvider<WebAssemblyModule, DummyMetadata, SingleVariantDescriptor>
+public class StaticWebAssemblyModule() : StaticAssetProvider<WebAssemblyModule, DummyMetadata, SingleVariantDescriptor>()
 {
     /// <inheritdoc/>
-    public override EngineAssetClass AssetClass => EngineAssetClass.Other;
+    override public EngineAssetClass AssetClass => EngineAssetClass.Other;
 
     /// <inheritdoc/>
-    protected override ValueTask<SingleVariantDescriptor> UpdateVariantDescriptor(DummyMetadata metadata, SingleVariantDescriptor currentDescriptor)
+    override protected ValueTask<SingleVariantDescriptor> UpdateVariantDescriptor(DummyMetadata metadata, SingleVariantDescriptor currentDescriptor)
     {
         if (currentDescriptor is null) return new(new SingleVariantDescriptor(typeof(WebAssemblyModule)));
-        Sync<Uri> _ = new();
         return new();
     }
 }
@@ -54,7 +52,7 @@ public sealed class WebAssemblyModule() : Asset<SingleVariantDescriptor>
             // TODO: If the gatherer has to download the asset, the module should be instantiated while streaming.
             try
             {
-                //WasmModule = Wasmtime.Module.FromFile(WasmEngineProvider.Engine, file);
+                WasmModule = Wasmtime.Module.FromFile(WasmEngineProvider.Engine, file);
             }
             catch (Wasmtime.WasmtimeException error)
             {

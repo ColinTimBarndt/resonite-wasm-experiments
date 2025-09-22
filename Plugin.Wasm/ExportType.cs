@@ -2,7 +2,6 @@ using Elements.Data;
 
 namespace Plugin.Wasm;
 
-/*
 [DataModelType]
 public enum WebAssemblyExportType
 {
@@ -11,4 +10,3 @@ public enum WebAssemblyExportType
     Memory,
     Function,
 }
-*/
