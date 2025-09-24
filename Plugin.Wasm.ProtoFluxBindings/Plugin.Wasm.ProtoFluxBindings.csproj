@@ -45,7 +45,7 @@
 
     <!-- Run Bindings Generator -->
     <Exec
-      Command="dotnet $(ResonitePath)Tools/ProtofluxBindingGenerator/net9.0/ProtoFluxBindingGenerator.dll $(MSBuildProjectDirectory)/bindings $(BindgenTarget)" />
+      Command="dotnet &quot;$(ResonitePath)Tools/ProtofluxBindingGenerator/net9.0/ProtoFluxBindingGenerator.dll&quot; &quot;$(MSBuildProjectDirectory)/bindings&quot; &quot;$(BindgenTarget)&quot;" />
     <!-- Clean up the required DLLs -->
     <Delete Files="@(DestFiles)" />
 
@@ -62,7 +62,7 @@
   <Target Name="ILRepack" AfterTargets="Build">
     <Message Text="Repacking Plugin DLLs" />
     <Exec
-      Command="dotnet tool run ilrepack /out:Plugin.Wasm.dll /lib:$(ResonitePath) $(TargetDir)/Plugin.Wasm.dll $(TargetDir)/$(AssemblyName).dll" />
+      Command="dotnet tool run ilrepack /out:Plugin.Wasm.dll /lib:&quot;$(ResonitePath)&quot; &quot;$(TargetDir)/Plugin.Wasm.dll&quot; &quot;$(TargetDir)/$(AssemblyName).dll&quot;" />
   </Target>
 
   <Target Name="Install" AfterTargets="ILRepack">
