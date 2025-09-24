@@ -1,54 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyTitle>Plugin.Wasm</AssemblyTitle>
     <RootNamespace>Plugin.Wasm</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <!-- Runtime -->
     <PackageReference Include="wasmtime" Version="34.0.2" />
+    <!-- Post-Processing -->
+    <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
+    <WeaverFiles Include="$(ResonitePath)Weavers.dll" WeaverClassNames="NodeWeaver" />
   </ItemGroup>
-
-  <Target Name="GenerateBindings" AfterTargets="Build">
-    <!-- Symlink required DLLs. if you make no reference to FrooxEngine in your code then you can
-    remove everything but ProtoFlux.Core.dll -->
-    <ItemGroup>
-      <SourceFiles
-        Include="
-                $(ResonitePath)ProtoFlux.Core.dll;
-                $(ResonitePath)FrooxEngine.dll;
-                $(ResonitePath)SkyFrost.Base.dll;
-                $(ResonitePath)Renderite.Shared.dll;
-                $(ResonitePath)Elements.Assets.dll;
-                $(ResonitePath)BepuPhysics.dll;" />
-      <DestFiles
-        Include="
-                $(TargetDir)ProtoFlux.Core.dll;
-                $(TargetDir)FrooxEngine.dll;
-                $(TargetDir)SkyFrost.Base.dll;
-                $(TargetDir)Renderite.Shared.dll;
-                $(TargetDir)Elements.Assets.dll;
-                $(TargetDir)BepuPhysics.dll;" />
-    </ItemGroup>
-    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(TargetDir)"
-      UseSymboliclinksIfPossible="true" />
-
-    <!-- Run Bindings Generator -->
-    <Exec
-      Command="dotnet $(ResonitePath)Tools/ProtofluxBindingGenerator/net9.0/ProtoFluxBindingGenerator.dll $(MSBuildProjectDirectory)/../$(AssemblyTitle).ProtoFluxBindings/bindings $(TargetDir)" />
-    <!-- Clean up the required DLLs -->
-    <Delete Files="@(DestFiles)" />
-
-    <ItemGroup>
-      <GeneratedFiles Include="../Plugin.Wasm.ProtoFluxBindings/**/*.cs" />
-      <GeneratedWasmFiles Include="../Plugin.Wasm.ProtoFluxBindings/bindings/Plugin/Wasm/**/*.cs" />
-      <GeneratedFiles Remove="@(GeneratedWasmFiles)" />
-      <GeneratedFiles Remove="../Plugin.Wasm.ProtoFluxBindings/bindings/*.cs" />
-    </ItemGroup>
-
-    <Delete Files="@(GeneratedFiles)" />
-  </Target>
 </Project>

@@ -12,16 +12,23 @@ namespace Plugin.Wasm.ProtoFlux;
 [NodeName("Load File", false)]
 public class LoadFile : AsyncActionNode<FrooxEngineContext>
 {
-    public readonly ObjectInput<string?> WasmFile;
+    // Inputs
+    public ObjectArgument<string?> WasmFile;
 
+    // Outputs
     public readonly ObjectOutput<Uri?> ModuleAsset;
 
     public Continuation OnLoaded;
     public Continuation OnFailed;
 
+    public LoadFile()
+    {
+        ModuleAsset = new(this);
+    }
+
     protected override async Task<IOperation> RunAsync(FrooxEngineContext context)
     {
-        var file = WasmFile.Evaluate(context);
+        var file = WasmFile.ReadObject(context);
         if (file is null || !file.EndsWith(".wasm")) return OnFailed.Target;
 
         try
