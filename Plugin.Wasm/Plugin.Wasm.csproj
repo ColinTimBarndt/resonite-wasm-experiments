@@ -5,9 +5,11 @@
 
   <ItemGroup>
     <!-- Runtime -->
+    <!-- <PackageReference Include="Sigil" Version="5.0.0" /> -->
     <PackageReference Include="wasmtime" Version="34.0.2" />
     <!-- Post-Processing -->
     <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
-    <WeaverFiles Include="$(ResonitePath)Weavers.dll" WeaverClassNames="NodeWeaver" />
+    <PackageReference Include="FluxWeaver.Fody" Version="1.0.0" PrivateAssets="all" />
+    <!-- <WeaverFiles Include="$(ResonitePath)Weavers.dll" WeaverClassNames="NodeWeaver" /> -->
   </ItemGroup>
 </Project>

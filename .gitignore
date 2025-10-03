@@ -7,3 +7,6 @@
 # Ignore bindings but keep the directory
 */bindings/*
 !*/bindings/.gitkeep
+
+/nuget.config
+/nupkgs

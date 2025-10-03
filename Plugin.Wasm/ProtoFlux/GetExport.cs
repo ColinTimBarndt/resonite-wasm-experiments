@@ -3,9 +3,9 @@ using ProtoFlux.Runtimes.Execution;
 
 namespace Plugin.Wasm.ProtoFlux;
 
-[NodeCategory("Wasm")]
+[NodeCategory("Web Assembly")]
 [NodeName("Get Export", false)]
-public class GetExport : ExecutionNode<ExecutionContext>
+public sealed class GetExport : VoidNode<ExecutionContext>
 {
     // Inputs
     public ObjectArgument<WebAssemblyModule?> Module;
@@ -15,15 +15,10 @@ public class GetExport : ExecutionNode<ExecutionContext>
     public readonly ObjectOutput<string> Name;
     public readonly ValueOutput<WebAssemblyExportType> Type;
 
+    /// <inheritdoc/>
     public override bool CanBeEvaluated => true;
 
-    public GetExport()
-    {
-        Name = new(this);
-        Type = new(this);
-    }
-
-    public override void Evaluate(ExecutionContext context)
+    protected override void ComputeOutputs(ExecutionContext context)
     {
         var module = Module.ReadObject(context)?.WasmModule;
         if (module is null) return;

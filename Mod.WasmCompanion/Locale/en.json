@@ -1,0 +1,8 @@
+{
+  "localeCode": "en",
+  "authors": [ "Colin The Cat" ],
+  "messages": {
+    "Mod.WasmInspector.WorkerInspectorPatch.Name": "Worker Inspector Patch",
+    "Mod.WasmInspector.WorkerInspectorPatch.Description": "Adds inspector UI support for WebAssembly plugin types."
+  }
+}

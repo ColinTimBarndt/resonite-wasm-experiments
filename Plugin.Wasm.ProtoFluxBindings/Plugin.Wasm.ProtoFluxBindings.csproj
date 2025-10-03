@@ -3,6 +3,7 @@
     <RootNamespace>PluginBindings</RootNamespace>
     <NoWarn>CS1591</NoWarn>
     <WarningLevel>1</WarningLevel>
+    <DisableFody>true</DisableFody>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
                 $(ResonitePath)SkyFrost.Base.dll;
                 $(ResonitePath)Renderite.Shared.dll;
                 $(ResonitePath)Elements.Assets.dll;
+                $(ResonitePath)ProtoFluxBindings.dll;
                 $(ResonitePath)BepuPhysics.dll;" />
       <DestFiles
         Include="
@@ -37,6 +39,7 @@
                 $(BindgenTarget)SkyFrost.Base.dll;
                 $(BindgenTarget)Renderite.Shared.dll;
                 $(BindgenTarget)Elements.Assets.dll;
+                $(BindgenTarget)ProtoFluxBindings.dll;
                 $(BindgenTarget)BepuPhysics.dll;" />
     </ItemGroup>
 
@@ -48,6 +51,7 @@
       Command="dotnet &quot;$(ResonitePath)Tools/ProtofluxBindingGenerator/net9.0/ProtoFluxBindingGenerator.dll&quot; &quot;$(MSBuildProjectDirectory)/bindings&quot; &quot;$(BindgenTarget)&quot;" />
     <!-- Clean up the required DLLs -->
     <Delete Files="@(DestFiles)" />
+    <Delete Files="bindings/Plugin/Wasm/ProtoFlux/CallFunction.cs" />
 
     <ItemGroup>
       <DiscardFiles Include="bindings/**/*.cs" />

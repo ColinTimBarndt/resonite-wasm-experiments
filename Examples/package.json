@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "node tests",
+    "asbuild:debug": "asc assembly/index.ts --target debug --enable reference-types",
+    "asbuild:release": "asc assembly/index.ts --target release --enable reference-types",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "start": "npx serve ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "assemblyscript": "^0.28.8"
+  },
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  }
+}

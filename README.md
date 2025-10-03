@@ -2,6 +2,8 @@
 
 This plugin provides experimental WebAssembly support for Resonite.
 
+![Loading WASM from ProtoFlux](Assets/LoadingProtoFlux.png)
+
 ## Build Tools
 
 This project is using [ILRepack](https://www.nuget.org/packages/ILRepack/) for building a combined DLL.

@@ -8,12 +8,12 @@ using ProtoFlux.Runtimes.Execution;
 
 namespace Plugin.Wasm.ProtoFlux;
 
-[NodeCategory("Wasm")]
+[NodeCategory("Web Assembly")]
 [NodeName("Load File", false)]
 public class LoadFile : AsyncActionNode<FrooxEngineContext>
 {
     // Inputs
-    public ObjectArgument<string?> WasmFile;
+    public ObjectInput<string?> WasmFile;
 
     // Outputs
     public readonly ObjectOutput<Uri?> ModuleAsset;
@@ -21,14 +21,9 @@ public class LoadFile : AsyncActionNode<FrooxEngineContext>
     public Continuation OnLoaded;
     public Continuation OnFailed;
 
-    public LoadFile()
-    {
-        ModuleAsset = new(this);
-    }
-
     protected override async Task<IOperation> RunAsync(FrooxEngineContext context)
     {
-        var file = WasmFile.ReadObject(context);
+        var file = WasmFile.Evaluate(context);
         if (file is null || !file.EndsWith(".wasm")) return OnFailed.Target;
 
         try

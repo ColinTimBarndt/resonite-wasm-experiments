@@ -7,7 +7,7 @@ namespace Plugin.Wasm;
 /// <summary>
 /// Provides a statically loaded WebAssembly module asset.
 /// </summary>
-[Category(["Assets"])]
+[Category(["Web Assembly", "Assets"])]
 public class StaticWebAssemblyModule() : StaticAssetProvider<WebAssemblyModule, DummyMetadata, SingleVariantDescriptor>()
 {
     /// <inheritdoc/>

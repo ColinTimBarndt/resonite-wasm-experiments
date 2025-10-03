@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyFileName>$(AssemblyTitle).dll</AssemblyFileName>
+    <LangVersion>13.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+    <CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
+
+    <RestoreAdditionalProjectSources>
+      https://nuget.pkg.github.com/MonkeyModdingTroop/index.json;
+      https://nuget.pkg.github.com/ResoniteModdingGroup/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- NuGet metadata -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>False</IncludeSymbols>
+    <EmbedAllSources>True</EmbedAllSources>
+    <EmbedUntrackedSources>True</EmbedUntrackedSources>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- NuGet metadata -->
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>Mod.Wasm</PackageId>
+    <Title>WebAssembly Companion for MonkeyLoader</Title>
+    <Authors>Colin The Cat</Authors>
+    <Version>0.1.0</Version>
+    <Description>This mod modifies parts of the game which the Wasm Plugin can't.</Description>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ColinTimBarndt/resonite-wasm-experiments</PackageProjectUrl>
+    <PackageTags>mod; mods; monkeyloader; resonite</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="Locale/*" Pack="true" PackagePath="content/Locale/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonkeyLoader.GamePacks.Resonite" Version="0.25.1-beta"
+      GeneratePathProperty="true" />
+    <PackageReference Include="Resonite.Elements.Core" Version="1.4.9.4" />
+    <PackageReference Include="Resonite.FrooxEngine" Version="2025.8.28.607" />
+    <PackageReference Include="MicroUtils.HarmonyAnalyzers" Version="1.6.1" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
