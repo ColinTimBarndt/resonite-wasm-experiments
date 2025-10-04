@@ -225,11 +225,16 @@ public abstract class SyncElementStruct : ConflictingSyncElement
                 i++;
                 continue;
             }
-            var r = records![i++];
-            if (r.type == expectedType) continue;
+            var r = records![i];
+            if (r.type == expectedType)
+            {
+                i++;
+                continue;
+            }
 
             RemoveAt(i);
             Insert(i, expectedType);
+            i++;
         }
         while (Count > i)
         {
