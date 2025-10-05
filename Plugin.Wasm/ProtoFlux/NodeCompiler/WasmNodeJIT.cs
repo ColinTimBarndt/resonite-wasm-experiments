@@ -61,7 +61,7 @@ internal static class WasmNodeJIT
                 $"{baseNode.Name}${UniqueID++:X4}{signature}",
                 baseNode,
                 new(signature),
-                new DelegatedEvaluateMethodCompiler()
+                compiler
             );
             builder.AddCompiler(new InternalSetDelegateMethodCompiler());
             builder.AddCompiler(new SignatureGetterCompiler());
