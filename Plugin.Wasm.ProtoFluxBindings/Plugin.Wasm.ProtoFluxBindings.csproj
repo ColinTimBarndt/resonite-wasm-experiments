@@ -51,12 +51,12 @@
       Command="dotnet &quot;$(ResonitePath)Tools/ProtofluxBindingGenerator/net9.0/ProtoFluxBindingGenerator.dll&quot; &quot;$(MSBuildProjectDirectory)/bindings&quot; &quot;$(BindgenTarget)&quot;" />
     <!-- Clean up the required DLLs -->
     <Delete Files="@(DestFiles)" />
-    <Delete Files="bindings/Plugin/Wasm/ProtoFlux/CallFunction.cs" />
 
     <ItemGroup>
       <DiscardFiles Include="bindings/**/*.cs" />
       <KeepFiles Include="bindings/Plugin/Wasm/**/*.cs" />
       <KeepFiles Include="bindings/*.cs" />
+      <KeepFiles Remove="bindings/Plugin/Wasm/**/*WebAssembly*.cs" />
       <DiscardFiles Remove="@(KeepFiles)" />
     </ItemGroup>
 

@@ -38,12 +38,6 @@ internal static class WasmNodeJIT
 
     public static Type GetFunctionType(FunctionSignature signature) => FunctionCache.GetOrAdd(signature, CompileFunctionNode);
 
-    public static WebAssemblyAction NewAction(FunctionSignature signature)
-        => (WebAssemblyAction)Activator.CreateInstance(GetActionType(signature))!;
-
-    public static WebAssemblyFunction NewFunction(FunctionSignature signature)
-        => (WebAssemblyFunction)Activator.CreateInstance(GetFunctionType(signature))!;
-
     private static readonly System.Threading.Lock jitLock = new();
 
     //static WasmNodeJIT()
@@ -65,7 +59,7 @@ internal static class WasmNodeJIT
             var builder = NodeBuilder<DelegateState>.Create(
                 DynamicModuleBuilder,
                 $"{baseNode.Name}${UniqueID++:X4}{signature}",
-                typeof(WebAssemblyFunction),
+                baseNode,
                 new(signature),
                 new DelegatedEvaluateMethodCompiler()
             );
