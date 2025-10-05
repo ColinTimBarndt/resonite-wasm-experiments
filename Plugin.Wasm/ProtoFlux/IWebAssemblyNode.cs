@@ -1,8 +1,10 @@
-using FrooxEngine.ProtoFlux;
 using ProtoFlux.Runtimes.Execution;
 
 namespace Plugin.Wasm.ProtoFlux;
 
+/// <summary>
+/// A ProtoFlux Node wrapping a WebAssembly exported function.
+/// </summary>
 public interface IWebAssemblyNode : IExecutionNode<ExecutionContext>
 {
     /// <summary>

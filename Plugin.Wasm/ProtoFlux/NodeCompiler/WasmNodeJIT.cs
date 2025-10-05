@@ -46,10 +46,10 @@ internal static class WasmNodeJIT
     //}
 
     private static Type CompileActionNode(FunctionSignature signature)
-        => CompileNode(signature, typeof(WebAssemblyAction), new DelegatedBreakableExecuteMethodCompiler());
+        => CompileNode(signature, typeof(WebAssemblyAction), DelegatedBreakableExecuteMethodCompiler.Instance);
 
     private static Type CompileFunctionNode(FunctionSignature signature)
-        => CompileNode(signature, typeof(WebAssemblyFunction), new DelegatedEvaluateMethodCompiler());
+        => CompileNode(signature, typeof(WebAssemblyFunction), DelegatedEvaluateMethodCompiler.Instance);
 
     private static Type CompileNode(FunctionSignature signature, Type baseNode, IRunMethodCompiler<DelegateState> compiler)
     {

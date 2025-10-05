@@ -99,6 +99,10 @@ internal abstract class DelegatedRunMethodCompiler : BaseRunMethodCompiler<Deleg
 
 internal class DelegatedEvaluateMethodCompiler : DelegatedRunMethodCompiler
 {
+    public static readonly IRunMethodCompiler<DelegateState> Instance = new DelegatedEvaluateMethodCompiler();
+
+    protected DelegatedEvaluateMethodCompiler() { }
+
     public sealed override bool CanBeEvaluated => true;
 
     public sealed override string MethodName => "ComputeOutputs";
@@ -106,6 +110,10 @@ internal class DelegatedEvaluateMethodCompiler : DelegatedRunMethodCompiler
 
 internal class DelegatedExecuteMethodCompiler : DelegatedRunMethodCompiler
 {
+    public static readonly IRunMethodCompiler<DelegateState> Instance = new DelegatedExecuteMethodCompiler();
+
+    protected DelegatedExecuteMethodCompiler() { }
+
     public sealed override bool CanBeEvaluated => false;
 
     public sealed override string MethodName => "Do";
@@ -113,6 +121,10 @@ internal class DelegatedExecuteMethodCompiler : DelegatedRunMethodCompiler
 
 internal class DelegatedBreakableExecuteMethodCompiler : DelegatedExecuteMethodCompiler
 {
+    new public static readonly IRunMethodCompiler<DelegateState> Instance = new DelegatedBreakableExecuteMethodCompiler();
+
+    protected DelegatedBreakableExecuteMethodCompiler() { }
+
     public sealed override Type? ReturnType => typeof(bool);
 
     protected sealed override void EmitReturn(ILGenerator il, bool success)

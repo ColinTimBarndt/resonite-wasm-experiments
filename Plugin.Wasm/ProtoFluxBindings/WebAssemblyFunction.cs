@@ -9,6 +9,9 @@ namespace Plugin.Wasm.ProtoFluxBindings;
 
 using FunctionNode = Plugin.Wasm.ProtoFlux.WebAssemblyFunction;
 
+/// <summary>
+/// FrooxEngine bindings for the corresponding WebAssembly Function ProtoFlux node.
+/// </summary>
 public sealed class WebAssemblyFunction : BaseWebAssemblyNode<ExecutionContext, FunctionNode>
 {
     /// <inheritdoc/>
