@@ -5,7 +5,7 @@ namespace Plugin.Wasm.ProtoFlux;
 /// <summary>
 /// A ProtoFlux Node wrapping a WebAssembly exported function.
 /// </summary>
-public interface IWebAssemblyNode : IExecutionNode<ExecutionContext>
+public interface IWebAssemblyNode : IExecutionNode
 {
     /// <summary>
     /// The function signature of the JIT-compiled node.
@@ -17,3 +17,9 @@ public interface IWebAssemblyNode : IExecutionNode<ExecutionContext>
     /// </summary>
     bool TrySetFunction(Wasmtime.Function? func);
 }
+
+/// <summary>
+/// A ProtoFlux Node wrapping a WebAssembly exported function.
+/// </summary>
+public interface IWebAssemblyNode<C> : IWebAssemblyNode, IExecutionNode<C> where C : ExecutionContext
+{ }

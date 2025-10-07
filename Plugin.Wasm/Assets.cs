@@ -1,35 +1,42 @@
+using System;
 using System.Threading.Tasks;
-using Elements.Assets;
+using Elements.Core;
 using FrooxEngine;
 
 namespace Plugin.Wasm;
-
-/// <summary>
-/// Provides a statically loaded WebAssembly module asset.
-/// </summary>
-[Category(["Web Assembly", "Assets"])]
-public class StaticWebAssemblyModule() : StaticAssetProvider<WebAssemblyModule, DummyMetadata, SingleVariantDescriptor>()
-{
-    /// <inheritdoc/>
-    override public EngineAssetClass AssetClass => EngineAssetClass.Other;
-
-    /// <inheritdoc/>
-    override protected ValueTask<SingleVariantDescriptor> UpdateVariantDescriptor(DummyMetadata metadata, SingleVariantDescriptor currentDescriptor)
-    {
-        if (currentDescriptor is null) return new(new SingleVariantDescriptor(typeof(WebAssemblyModule)));
-        return new();
-    }
-}
 
 /// <summary>
 /// A WebAssembly Module asset.
 /// </summary>
 public sealed class WebAssemblyModule() : Asset<SingleVariantDescriptor>
 {
+    private Wasmtime.Module? _module;
+
     /// <summary>
     /// If loaded, holds the compiled WebAssembly module.
     /// </summary>
-    public Wasmtime.Module? WasmModule { get; private set; } = null;
+    public Wasmtime.Module? WasmModule
+    {
+        get => _module;
+        set
+        {
+            _module = value;
+            UniLog.Log("SET NEW MODULE");
+            OnModuleChanged?.Invoke(this);
+        }
+    }
+
+    internal void ReplaceModule(Wasmtime.Module newModule)
+    {
+        _module?.Dispose();
+        WasmModule = newModule;
+    }
+
+    /// <summary>
+    /// Fired when the WebAssembly module changes.
+    /// This is not synchronous with the world!
+    /// </summary>
+    public event Action<WebAssemblyModule>? OnModuleChanged;
 
     /// <inheritdoc/>
     public override void Unload()

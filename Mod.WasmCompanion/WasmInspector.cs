@@ -7,7 +7,7 @@ using FrooxEngine.UIX;
 using HarmonyLib;
 using MonkeyLoader.Resonite;
 
-namespace Mod.WasmInspector;
+namespace Mod.WasmCompanion;
 
 internal class WasmInspector : ResoniteMonkey<WasmInspector>
 {
@@ -15,7 +15,7 @@ internal class WasmInspector : ResoniteMonkey<WasmInspector>
     public static Type? CustomStructEditorAttribute { get; private set; }
     public static Type? StructEditor { get; private set; }
     public static FieldInfo? StructEditorComponent { get; private set; }
-    public static MethodInfo? SyncElementStructElements { get; private set; }
+    //public static MethodInfo? SyncElementStructElements { get; private set; }
     public static MethodInfo? SetupEditor { get; private set; }
 
     public const string SYNC_ELEMENT_STRUCT_TYPE = "Plugin.Wasm.GenericCollections.SyncElementStruct";
@@ -55,14 +55,14 @@ internal class WasmInspector : ResoniteMonkey<WasmInspector>
         }
         SetupEditor = setupEditor;
 
-        var elements = AccessTools.PropertyGetter(syncElementStruct, "Elements");
+        //var elements = AccessTools.PropertyGetter(syncElementStruct, "Elements");
 
-        if (elements is null || !elements.ReturnType.IsAssignableTo(typeof(IEnumerator<ISyncMember>)))
-        {
-            Logger.Warn(() => $"Unable to find elements iterator '{elements}' for '{syncElementStruct}'.");
-            return false;
-        }
-        SyncElementStructElements = elements;
+        //if (elements is null || !elements.ReturnType.IsAssignableTo(typeof(IEnumerable<ISyncMember>)))
+        //{
+        //    Logger.Warn(() => $"Unable to find elements iterator '{elements}' for '{syncElementStruct}'.");
+        //    return false;
+        //}
+        //SyncElementStructElements = elements;
 
         return true;
     }
@@ -90,7 +90,7 @@ internal readonly struct SyncElementStruct
 {
     public readonly ConflictingSyncElement Value;
 
-    public IEnumerator<ISyncMember> Elements => (IEnumerator<ISyncMember>)WasmInspector.SyncElementStructElements!.Invoke(Value, null)!;
+    //public IEnumerable<ISyncMember> Elements => (IEnumerable<ISyncMember>)WasmInspector.SyncElementStructElements!.Invoke(Value, null)!;
 
     internal SyncElementStruct(ConflictingSyncElement value)
     {

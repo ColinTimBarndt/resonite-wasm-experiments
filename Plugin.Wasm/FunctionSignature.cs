@@ -51,11 +51,11 @@ public readonly struct FunctionSignature(Type[]? parameters, Type[]? results) : 
         }
         if (_results is not null)
         {
-            if (_results.Length > 1)
+            if (_results.Length >= 2)
             {
                 Type? tuple = null;
-                var resultCardinality = _results.Length - 1;
-                if (resultCardinality < TupleTypes.Length) tuple = TupleTypes[resultCardinality];
+                var resultTypeIndex = _results.Length - 2; // index starts at 2 elements
+                if (resultTypeIndex < TupleTypes.Length) tuple = TupleTypes[resultTypeIndex];
                 if (tuple is null)
                 {
                     throw new NotImplementedException("Arbitrary result cardinality");
@@ -117,8 +117,9 @@ public readonly struct FunctionSignature(Type[]? parameters, Type[]? results) : 
         if (!HasParameters && !HasResults) return func.WrapAction();
         var genArgs = GetGenericArgs(out _);
         var methodName = HasResults ? "WrapFunc" : "WrapAction";
+        //func.WrapFunc<>();
 
-        UniLog.Log($"TryCreateDelegate({func}) with {methodName}<{string.Join<Type>(',', genArgs)}>");
+        //UniLog.Log($"TryCreateDelegate({func}) with {methodName}<{string.Join<Type>(',', genArgs)}>");
         var method = typeof(Wasmtime.Function).GetMethod(methodName, genArgs.Length, BindingFlags.Instance | BindingFlags.Public, null, [], null)
             ?? throw new Exception("Unable to find method to create delegate with");
 
@@ -281,8 +282,8 @@ public readonly struct FunctionSignature(Type[]? parameters, Type[]? results) : 
     ];
 
     private static readonly Type[] TupleTypes = [
-        typeof(Tuple<,>), typeof(Tuple<,,>), typeof(Tuple<,,,>), typeof(Tuple<,,,,>),
-        typeof(Tuple<,,,,,>), typeof(Tuple<,,,,,,>), typeof(Tuple<,,,,,,,>),
+        typeof(ValueTuple<,>), typeof(ValueTuple<,,>), typeof(ValueTuple<,,,>), typeof(ValueTuple<,,,,>),
+        typeof(ValueTuple<,,,,,>), typeof(ValueTuple<,,,,,,>), typeof(ValueTuple<,,,,,,,>),
     ];
 
     internal static readonly ConstructorInfo Constructor = typeof(FunctionSignature).GetConstructor([typeof(Type[]), typeof(Type[])])

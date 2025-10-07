@@ -29,23 +29,48 @@ public sealed class WebAssemblyInstance : Component
     // Local state
     private Wasmtime.Store? Store;
     private Wasmtime.Instance? Instance;
-    private WeakReference<Wasmtime.Module>? InstanceModule;
-    private bool _exportNamesDirty = false;
+    private WebAssemblyModule? _currentInstanceModule;
+    private bool _exportNamesDirty;
+    private bool _instanceDirty;
 
     /// <inheritdoc/>
     protected override void OnChanges()
     {
-        var module = Module.Asset?.WasmModule;
-        UpdateInstance(module);
+        var asset = Module.Asset;
+        if (asset != _currentInstanceModule)
+        {
+            if (_currentInstanceModule is not null)
+                _currentInstanceModule.OnModuleChanged -= OnModuleChanged;
+            _currentInstanceModule = asset;
+            if (_currentInstanceModule is not null)
+                _currentInstanceModule.OnModuleChanged += OnModuleChanged;
+            _instanceDirty = true;
+        }
+
+        if (_instanceDirty)
+        {
+            _instanceDirty = false;
+            UpdateInstance(_currentInstanceModule?.WasmModule);
+        }
 
         if (_exportNamesDirty && Instance is not null)
         {
             _exportNamesDirty = false;
             foreach (var export in FunctionExports.Values)
             {
-                export.Function = Instance.GetFunction(export.ExportName);
+                string? name = export.ExportName;
+                export.Function = name is null ? null : Instance.GetFunction(name);
             }
         }
+    }
+
+    private void OnModuleChanged(WebAssemblyModule newModule)
+    {
+        RunSynchronously(() =>
+        {
+            _instanceDirty = true;
+            MarkChangeDirty();
+        });
     }
 
     private void UpdateInstance(Wasmtime.Module? module)
@@ -54,22 +79,14 @@ public sealed class WebAssemblyInstance : Component
         {
             if (Instance is null) return;
             Instance = null;
-            InstanceModule = null;
             IsLoaded.Value = false;
             UpdateExports();
             Store?.Dispose();
             Store = null;
             return;
         }
-        if (InstanceModule is null
-            || !InstanceModule.TryGetTarget(out var instanceModule)
-            || instanceModule != module
-        )
-        {
-            // The referenced module has changed
-            if (TryLoadModule(module))
-                UpdateExports();
-        }
+        if (TryLoadModule(module))
+            UpdateExports();
     }
 
     private bool TryLoadModule(Wasmtime.Module module)
@@ -79,11 +96,11 @@ public sealed class WebAssemblyInstance : Component
         try
         {
             Instance = new Wasmtime.Instance(newStore, module, []);
+            Store?.Dispose();
             Store = newStore;
-            InstanceModule = new(module);
             newStore = null;
             IsLoaded.Value = true;
-            UniLog.Log("Loaded WASM Module");
+            //Debug.Log("Created new WebAssembly Instance");
             return true;
         }
         catch (Wasmtime.WasmtimeException)
@@ -117,11 +134,12 @@ public sealed class WebAssemblyInstance : Component
             return;
         }
 
-        HashSet<string> Visited = [];
+        HashSet<string> Visited = Pool.BorrowHashSet<string>();
 
         foreach (var export in FunctionExports.Values)
         {
-            var name = export.ExportName;
+            string? name = export.ExportName;
+            if (name is null) continue;
             var func = inst.GetFunction(name);
             if (func is null) continue;
             Visited.Add(name);
@@ -137,6 +155,36 @@ public sealed class WebAssemblyInstance : Component
             exportMember.ExportName.Value = exportFunc.Name;
             exportMember.Function = exportFunc.Function;
         }
+
+        Pool.Return(ref Visited);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDispose()
+    {
+        if (_currentInstanceModule is not null)
+            _currentInstanceModule.OnModuleChanged -= OnModuleChanged;
+        base.OnDispose();
+    }
+
+    [SyncMethod(typeof(Action))]
+    public void RemoveEmptyExports()
+    {
+        foreach (var export in FunctionExports.Values)
+        {
+            if (export.Exists) continue;
+            FunctionExports.Remove(export);
+        }
+    }
+
+    [SyncMethod(typeof(Func<string, FunctionExport?>))]
+    public FunctionExport? GetFunctionExport(string name)
+    {
+        foreach (var export in FunctionExports.Values)
+        {
+            if (export.ExportName == name) return export;
+        }
+        return null;
     }
 
     /// <summary>
@@ -149,7 +197,7 @@ public sealed class WebAssemblyInstance : Component
         /// <summary>
         /// The name of the export.
         /// </summary>
-        public readonly Sync<string> ExportName;
+        public readonly Sync<string?> ExportName;
 
         /// <summary>
         /// Whether the export exists on the module, if one is loaded.
@@ -159,7 +207,7 @@ public sealed class WebAssemblyInstance : Component
 #pragma warning restore CS8618
 
         /// <inheritdoc/>
-        public override string Name => ExportName ?? "";
+        public override string Name => (string?)ExportName ?? "";
     }
 
     /// <summary>
@@ -198,6 +246,7 @@ public sealed class WebAssemblyInstance : Component
                 {
                     Signature = new FunctionSignature(in value);
                 }
+                //Debug.Log("FunctionExport OnFunctionChanged");
                 OnFunctionChanged?.Invoke(this);
             }
         }
@@ -206,6 +255,12 @@ public sealed class WebAssemblyInstance : Component
         /// Fired whenever the Function field changes.
         /// </summary>
         public event Action<FunctionExport>? OnFunctionChanged;
+
+        protected override void OnDispose()
+        {
+            Function = null;
+            base.OnDispose();
+        }
 
         /// <inheritdoc/>
         public override DataTreeNode Save(SaveControl control)

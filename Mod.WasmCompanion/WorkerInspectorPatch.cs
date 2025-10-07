@@ -7,7 +7,7 @@ using FrooxEngine.UIX;
 using HarmonyLib;
 using MonkeyLoader.Resonite;
 
-namespace Mod.WasmInspector;
+namespace Mod.WasmCompanion;
 
 [HarmonyPatchCategory(nameof(WorkerInspectorPatch))]
 [HarmonyPatch(typeof(SyncMemberEditorBuilder))]

@@ -86,7 +86,8 @@ internal abstract class DelegatedRunMethodCompiler : BaseRunMethodCompiler<Deleg
             {
                 // value = local0.Item(i)
                 il.Emit(OpCodes.Ldloc_0);
-                il.Emit(OpCodes.Ldfld, resultType.GetField($"Item{i}") ?? throw new Exception("Failed to get tuple ItemN field"));
+                var field = resultType.GetField($"Item{i + 1}") ?? throw new Exception($"Failed to get tuple Item{i + 1} property");
+                il.Emit(OpCodes.Ldfld, field);
             });
         }
     }

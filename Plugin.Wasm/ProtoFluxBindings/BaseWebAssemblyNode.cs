@@ -52,11 +52,6 @@ where W : class, IWebAssemblyNode
 
         var node = (W?)Activator.CreateInstance(GetWasmNodeType(_functionSignature))
             ?? throw new Exception("Activator instance is null");
-        var func = _currentFunctionProxy?.Value?.Function;
-        if (func is not null)
-        {
-            node.TrySetFunction(func);
-        }
 
         UniLog.Log($"Instance: {node}");
 
@@ -147,7 +142,7 @@ where W : class, IWebAssemblyNode
 
     private void OnFunctionGlobalChanged(IGlobalValueProxy changeable)
     {
-        UniLog.Log($"OnFunctionChanged {changeable}");
+        //Debug.Log($"OnFunctionGlobalChanged {changeable}");
         if (changeable is not FunctionExportGlobal globalFunc) return;
 
         OnFunctionChanged(globalFunc.Value);
@@ -155,7 +150,7 @@ where W : class, IWebAssemblyNode
 
     private void OnFunctionChanged(FunctionExport? func)
     {
-        UniLog.Log($"CallFunction OnFunctionChanged '{func?.Name}'");
+        //Debug.Log($"{nameof(BaseWebAssemblyNode<C, W>)} Binding OnFunctionChanged '{func?.Name}'");
         if (func is null)
         {
             FunctionName = null;
@@ -204,6 +199,9 @@ where W : class, IWebAssemblyNode
 
     /// <inheritdoc/>
     public override int NodeOutputCount => base.NodeOutputCount + Outputs.Count;
+
+    /// <inheritdoc/>
+    public override int NodeGlobalRefCount => base.NodeGlobalRefCount + 1;
 
 #pragma warning disable CS8766, CS8768, CS8600, CS8764 // Null checks are wrong here
 
