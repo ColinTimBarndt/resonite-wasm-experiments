@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Wasm", "Plugin.Wasm\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Wasm.ProtoFluxBindings", "Plugin.Wasm.ProtoFluxBindings\Plugin.Wasm.ProtoFluxBindings.csproj", "{87EC81A6-DDFE-4101-8C56-E82E32B952CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buildtools", "Buildtools\Buildtools.csproj", "{5B20CEF1-C707-493A-B63E-201407EC6642}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mod.WasmCompanion", "Mod.WasmCompanion\Mod.WasmCompanion.csproj", "{19B2EB83-187A-4876-8581-0728AC6917A6}"
 EndProject
 Global
@@ -28,10 +26,6 @@ Global
 		{87EC81A6-DDFE-4101-8C56-E82E32B952CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87EC81A6-DDFE-4101-8C56-E82E32B952CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87EC81A6-DDFE-4101-8C56-E82E32B952CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B20CEF1-C707-493A-B63E-201407EC6642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B20CEF1-C707-493A-B63E-201407EC6642}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B20CEF1-C707-493A-B63E-201407EC6642}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B20CEF1-C707-493A-B63E-201407EC6642}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19B2EB83-187A-4876-8581-0728AC6917A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19B2EB83-187A-4876-8581-0728AC6917A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19B2EB83-187A-4876-8581-0728AC6917A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
