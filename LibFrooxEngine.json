@@ -1,0 +1,96 @@
+{
+  "string": {
+    "len_wtf16": {
+      "type": "function",
+      "parameters": ["externref"],
+      "results": ["i32"]
+    },
+    "read_wtf16": {
+      "type": "function",
+      "parameters": ["externref", "i32", "$mutptr", "i32"],
+      "results": ["i32"]
+    },
+    "new_wtf16": {
+      "type": "function",
+      "parameters": ["$ptr", "i32"],
+      "results": ["externref"]
+    }
+  },
+  "math": {
+    "sin_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "cos_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "tan_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "asin_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "acos_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "atan_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "atan2_$f": {
+      "type": "function",
+      "parameters": ["$f", "$f"],
+      "results": ["$f"]
+    },
+    "sinh_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "cosh_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "tanh_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "sqrt_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "log_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "log10_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "exp_$f": {
+      "type": "function",
+      "parameters": ["$f"],
+      "results": ["$f"]
+    },
+    "pow_$f": {
+      "type": "function",
+      "parameters": ["$f", "$f"],
+      "results": ["$f"]
+    }
+  }
+}

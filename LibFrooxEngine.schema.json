@@ -1,0 +1,71 @@
+{
+  "$id": "https://raw.githubusercontent.com/ColinTimBarndt/resonite-wasm-experiments/refs/heads/main/LibFrooxengine.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "$comment": "WebAssembly namespaces",
+  "additionalProperties": {
+    "type": "object",
+    "$comment": "Import names",
+    "additionalProperties": {
+      "type": "object",
+      "$comment": "Imported item",
+      "unevaluatedProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": ["function", "global"]
+        },
+        "doc": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "function" } }
+          },
+          "then": {
+            "required": ["parameters", "results"],
+            "properties": {
+              "parameters": { "$ref": "#/$defs/wasm_types" },
+              "results": { "$ref": "#/$defs/wasm_types" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "global" } }
+          },
+          "then": {
+            "required": ["value_type"],
+            "properties": {
+              "value_type": { "$ref": "#/$defs/wasm_type" }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "wasm_type": {
+      "enum": [
+        "i8",
+        "i16",
+        "i32",
+        "i64",
+        "f32",
+        "f64",
+        "v128",
+        "externref",
+        "$f",
+        "$ptr",
+        "$mutptr"
+      ]
+    },
+    "wasm_types": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/wasm_type" }
+    }
+  }
+}

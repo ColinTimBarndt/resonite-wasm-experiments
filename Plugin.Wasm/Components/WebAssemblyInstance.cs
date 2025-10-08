@@ -92,10 +92,16 @@ public sealed class WebAssemblyInstance : Component
     private bool TryLoadModule(Wasmtime.Module module)
     {
         var engine = WasmEngineProvider.Engine;
-        var newStore = new Wasmtime.Store(engine);
+        var newStore = new Wasmtime.Store(engine, new StoreData());
         try
         {
-            Instance = new Wasmtime.Instance(newStore, module, []);
+            Instance = WasmLinkerProvider.Linker.Instantiate(newStore, module);
+            var memory = Instance.GetMemory("memory");
+            if (memory is not null)
+            {
+                var data = (StoreData)newStore.GetData()!;
+                data.Memory = memory;
+            }
             Store?.Dispose();
             Store = newStore;
             newStore = null;
@@ -167,6 +173,9 @@ public sealed class WebAssemblyInstance : Component
         base.OnDispose();
     }
 
+    /// <summary>
+    /// Removes all exports which don't exist on the current instance.
+    /// </summary>
     [SyncMethod(typeof(Action))]
     public void RemoveEmptyExports()
     {
@@ -177,6 +186,9 @@ public sealed class WebAssemblyInstance : Component
         }
     }
 
+    /// <summary>
+    /// Gets a named function export from the current instance.
+    /// </summary>
     [SyncMethod(typeof(Func<string, FunctionExport?>))]
     public FunctionExport? GetFunctionExport(string name)
     {
@@ -256,6 +268,7 @@ public sealed class WebAssemblyInstance : Component
         /// </summary>
         public event Action<FunctionExport>? OnFunctionChanged;
 
+        /// <inheritdoc/>
         protected override void OnDispose()
         {
             Function = null;

@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "Examples/Rust",
+  "bindings/rust/bindgen",
+  "bindings/rust/frooxengine-rs",
+]
+resolver = "2"
