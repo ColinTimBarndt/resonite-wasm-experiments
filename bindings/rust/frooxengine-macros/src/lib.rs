@@ -1,0 +1,119 @@
+mod parser;
+
+use proc_macro2::{Span, TokenStream};
+use quote::{quote, quote_spanned};
+use unsynn::TokenIter;
+
+use crate::parser::{ExportFunction, ReturnTypes};
+
+extern crate proc_macro;
+
+#[proc_macro_attribute]
+pub fn export_function(
+    attr: proc_macro::TokenStream,
+    item: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    if let Some(tok) = attr.into_iter().next() {
+        let span = tok.span().into();
+        return quote_spanned! {span=>
+            compile_error!("unexpected argument");
+        }
+        .into();
+    }
+
+    let mut item_iter = TokenIter::new(TokenStream::from(item).into_iter());
+
+    let export_fn = match ExportFunction::parse(&mut item_iter) {
+        Ok(v) => v,
+        Err(error) => {
+            let message = string_literal(error.to_string());
+            let span = item_iter
+                .nth(error.pos())
+                .map(|it| it.span())
+                .unwrap_or_else(Span::call_site);
+            return quote_spanned! {span=>
+                compile_error!(#message);
+            }
+            .into();
+        }
+    };
+
+    let ExportFunction {
+        vis,
+        name,
+        args,
+        returns,
+        body,
+    } = export_fn;
+
+    let mut returns_stream = returns
+        .as_ref()
+        .map(|r| TokenIter::new(r.clone().into_iter()));
+
+    let (return_types, is_tuple) = returns_stream
+        .as_mut()
+        .map(ReturnTypes::parse)
+        .map(|rts| (rts.types, rts.tuple))
+        .unwrap_or_default();
+
+    let ret_vars = (0..return_types.len()).map(|i| ident(format!("__r{i}"), Span::call_site()));
+    let ret_vars2 = ret_vars.clone();
+    let ret_args = return_types.iter().enumerate().map(|(i, typ)| {
+        let name = ident(format!("r{i}"), Span::call_site());
+        quote! { #name: #typ }
+    });
+
+    let ret_vars = if is_tuple {
+        quote!(#(#ret_vars,)*)
+    } else {
+        quote!(#(#ret_vars),*)
+    };
+
+    let mod_name = ident(format!("__wasm_export_{name}"), Span::call_site());
+    let unspan_name = ident(name.to_string(), Span::call_site());
+
+    let args_quote = args.iter().map(|(name, typ)| {
+        quote! { #name: #typ }
+    });
+    let args_quote2 = args_quote.clone();
+    let arg_names = args.iter().map(|(name, _)| name);
+
+    let wrap_returns = returns
+        .as_ref()
+        .map(|r| quote! { -> #r })
+        .unwrap_or_default();
+
+    quote! {
+        #[inline(always)]
+        #vis fn #name(#(#args_quote2),*) #wrap_returns {
+            #body
+        }
+
+        mod #mod_name {
+            /// # Safety
+            /// Do not call this function. It is post-processed
+            /// to change the calling convention.
+            #[unsafe(no_mangle)]
+            unsafe extern "C" fn #unspan_name(#(#args_quote),*) -> ! {
+                let (#ret_vars) = super::#name(#(#arg_names),*);
+                __return::#unspan_name(#(#ret_vars2),*)
+            }
+
+            mod __return {
+                #[link(wasm_import_module = "__export_returns")]
+                unsafe extern "C" {
+                    pub safe fn #unspan_name(#(#ret_args),*) -> !;
+                }
+            }
+        }
+    }
+    .into()
+}
+
+fn string_literal(str: impl AsRef<str>) -> proc_macro2::TokenTree {
+    proc_macro2::TokenTree::Literal(proc_macro2::Literal::string(str.as_ref()))
+}
+
+fn ident(name: impl AsRef<str>, span: proc_macro2::Span) -> proc_macro2::TokenTree {
+    proc_macro2::TokenTree::Ident(proc_macro2::Ident::new(name.as_ref(), span))
+}

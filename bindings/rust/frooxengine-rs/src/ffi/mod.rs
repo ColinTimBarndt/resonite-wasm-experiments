@@ -1,3 +1,4 @@
+#![allow(unused)]
 #[cfg(target_family = "wasm")]
 pub mod math {
     #[link(wasm_import_module = "math")]

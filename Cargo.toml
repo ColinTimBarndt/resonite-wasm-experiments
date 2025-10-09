@@ -2,6 +2,8 @@
 members = [
   "Examples/Rust",
   "bindings/rust/bindgen",
+  "bindings/rust/frooxengine-macros",
   "bindings/rust/frooxengine-rs",
+  "bindings/rust/wasm-weaver",
 ]
 resolver = "2"

@@ -2,3 +2,6 @@
 name = "frooxengine-rs"
 version = "0.1.0"
 edition = "2024"
+
+[dependencies]
+frooxengine-macros = { path = "../frooxengine-macros" }

@@ -2,6 +2,8 @@
 
 pub(crate) mod ffi;
 
+pub use frooxengine_macros::*;
+
 mod math;
 
 pub use math::FloatExt;

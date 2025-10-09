@@ -3,6 +3,9 @@ using Elements.Core;
 
 namespace Plugin.Wasm;
 
+/// <summary>
+/// Provides the global Wasmtime Linker instance.
+/// </summary>
 internal static class WasmLinkerProvider
 {
     public static Wasmtime.Linker Linker;

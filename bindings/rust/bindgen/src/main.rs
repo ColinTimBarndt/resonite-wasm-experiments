@@ -19,6 +19,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("Writing to: {out:?}");
 
+    writeln!(out, "#![allow(unused)]")?;
+
     for (ns, items) in imports {
         let modname = ns.replace('.', "_");
         writeln!(out, r#"#[cfg(target_family = "wasm")]"#)?;

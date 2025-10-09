@@ -1,5 +1,8 @@
 namespace Plugin.Wasm;
 
+/// <summary>
+/// Provides the global Wasmtime Engine instance.
+/// </summary>
 public static class WasmEngineProvider
 {
     /// <summary>
