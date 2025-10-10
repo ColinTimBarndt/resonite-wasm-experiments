@@ -60,7 +60,7 @@ pub fn export_function(
     let ret_vars2 = ret_vars.clone();
     let ret_args = return_types.iter().enumerate().map(|(i, typ)| {
         let name = ident(format!("r{i}"), Span::call_site());
-        quote! { #name: #typ }
+        quote! { #name: <#typ as ::frooxengine_rs::ValType>::Value }
     });
 
     let ret_vars = if is_tuple {
@@ -75,7 +75,9 @@ pub fn export_function(
     let args_quote = args.iter().map(|(name, typ)| {
         quote! { #name: #typ }
     });
-    let args_quote2 = args_quote.clone();
+    let args_mapped = args.iter().map(|(name, typ)| {
+        quote! { #name: <#typ as ::frooxengine_rs::ValType>::Value }
+    });
     let arg_names = args.iter().map(|(name, _)| name);
 
     let wrap_returns = returns
@@ -85,24 +87,34 @@ pub fn export_function(
 
     quote! {
         #[inline(always)]
-        #vis fn #name(#(#args_quote2),*) #wrap_returns {
+        #vis fn #name(#(#args_quote),*) #wrap_returns {
             #body
         }
 
         mod #mod_name {
+            use super::*;
+
             /// # Safety
             /// Do not call this function. It is post-processed
             /// to change the calling convention.
             #[unsafe(no_mangle)]
-            unsafe extern "C" fn #unspan_name(#(#args_quote),*) -> ! {
-                let (#ret_vars) = super::#name(#(#arg_names),*);
-                __return::#unspan_name(#(#ret_vars2),*)
+            unsafe extern "C" fn #unspan_name(#(#args_mapped),*) -> ! {
+                let (#ret_vars) = super::#name(#(
+                    unsafe { ::frooxengine_rs::ValType::make_box(#arg_names) }
+                ),*);
+                unsafe {
+                    __return::#unspan_name(
+                        #(::frooxengine_rs::ValType::unbox(#ret_vars2)),*
+                    )
+                }
             }
 
             mod __return {
+                use super::*;
+
                 #[link(wasm_import_module = "__export_returns")]
                 unsafe extern "C" {
-                    pub safe fn #unspan_name(#(#ret_args),*) -> !;
+                    pub fn #unspan_name(#(#ret_args),*) -> !;
                 }
             }
         }

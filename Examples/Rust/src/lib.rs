@@ -20,3 +20,8 @@ fn alot(x: i32) -> (i64, i64, i64) {
     let b = b as i64;
     (a * a, b * b, a * b)
 }
+
+#[export_function]
+fn external(object: externref, null: bool) -> externref {
+    if null { externref::NULL } else { object }
+}

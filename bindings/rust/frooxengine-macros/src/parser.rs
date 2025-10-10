@@ -3,36 +3,11 @@ use quote::quote;
 use unsynn::*;
 
 keyword! {
-    KExtern = "extern";
     KFn = "fn";
     KPub = "pub";
-    Ki8 = "i8";
-    Ku8 = "u8";
-    Ki16 = "i16";
-    Ku16 = "u16";
-    Ki32 = "i32";
-    Ku32 = "u32";
-    Ki64 = "i64";
-    Ku64 = "u64";
-    Kf32 = "f32";
-    Kf64 = "f64";
 }
 
 unsynn! {
-    enum WasmFnType {
-        I8(Ki8),
-        U8(Ku8),
-        I16(Ki16),
-        U16(Ku16),
-        I32(Ki32),
-        U32(Ku32),
-        I64(Ki64),
-        U64(Ku64),
-        F32(Kf32),
-        F64(Kf64),
-        Extern(KExtern),
-    }
-
     struct ExportFn {
         vis: Option<Vis>,
         _fn: KFn,
