@@ -1,36 +1,25 @@
-use core::{fmt::Debug, marker::PhantomData};
+use core::{fmt::Debug, marker::PhantomData, num::NonZeroU32};
 
-use crate::ValType;
+use crate::{ParameterValType, ResultValType, ValType};
 
 #[allow(non_camel_case_types)]
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct externref {
-    index: u32,
-    _phantom: PhantomData<*mut ()>,
-}
+pub struct Extern(NonZeroU32);
 
-impl externref {
-    pub const NULL: externref = externref {
-        index: 0,
-        _phantom: PhantomData,
-    };
-
+impl Extern {
     #[inline(always)]
-    pub fn is_null(&self) -> bool {
-        self.index == 0
+    pub fn as_ref<'r>(&'r self) -> ExternRef<'r> {
+        ExternRef(self.0, PhantomData)
     }
 }
 
 #[cfg(target_family = "wasm")]
-impl Drop for externref {
+impl Drop for Extern {
     #[inline(always)]
     fn drop(&mut self) {
-        if self.is_null() {
-            return;
-        }
         unsafe {
-            free(self.index);
+            free(self.0.get());
         }
 
         #[link(wasm_import_module = "__table")]
@@ -40,31 +29,92 @@ impl Drop for externref {
     }
 }
 
-impl crate::private::Sealed for externref {}
+impl crate::private::Sealed for Extern {}
+impl crate::private::SealedResult for Extern {}
 
-impl ValType for externref {
+impl ValType for Extern {
     type Value = u32;
+    /// Marks this value for the postprocessor as an owned external reference
+    const MARKER: [u8; 4] = *b"EXRo";
+}
 
-    #[inline(always)]
-    unsafe fn make_box(value: u32) -> Self {
-        return Self {
-            index: unsafe { alloc(value) },
-            _phantom: PhantomData,
-        };
-
-        #[link(wasm_import_module = "__table")]
-        unsafe extern "C" {
-            fn alloc(r: u32) -> u32;
-        }
-    }
-
+impl ResultValType for Extern {
     #[inline(always)]
     unsafe fn unbox(self) -> u32 {
-        return unsafe { get(self.index) };
+        unsafe { core::mem::transmute(self) }
+    }
+}
 
-        #[link(wasm_import_module = "__table")]
-        unsafe extern "C" {
-            fn get(r: u32) -> u32;
+impl crate::private::Sealed for Option<Extern> {}
+impl crate::private::SealedParameter for Option<Extern> {}
+impl crate::private::SealedResult for Option<Extern> {}
+
+impl ValType for Option<Extern> {
+    type Value = u32;
+    /// Marks this value for the postprocessor as an owned external reference
+    const MARKER: [u8; 4] = *b"EXRo";
+}
+
+impl ParameterValType for Option<Extern> {
+    unsafe fn make_box(value: Self::Value) -> Self {
+        NonZeroU32::new(value).map(Extern)
+    }
+}
+
+impl ResultValType for Option<Extern> {
+    #[inline(always)]
+    unsafe fn unbox(self) -> u32 {
+        let result = match &self {
+            Some(v) => v.0.get(),
+            None => 0,
+        };
+        core::mem::forget(self);
+        result
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct ExternRef<'r>(NonZeroU32, PhantomData<&'r Extern>);
+
+impl<'r> ExternRef<'r> {}
+
+impl Debug for ExternRef<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("ExternRef").field(&self.0).finish()
+    }
+}
+
+impl crate::private::Sealed for ExternRef<'_> {}
+impl crate::private::SealedResult for ExternRef<'_> {}
+
+impl ValType for ExternRef<'_> {
+    type Value = u32;
+    /// Marks this value for the postprocessor as an unowned external reference
+    const MARKER: [u8; 4] = *b"EXRr";
+}
+
+impl ResultValType for ExternRef<'_> {
+    #[inline(always)]
+    unsafe fn unbox(self) -> Self::Value {
+        self.0.get()
+    }
+}
+
+impl crate::private::Sealed for Option<ExternRef<'_>> {}
+impl crate::private::SealedResult for Option<ExternRef<'_>> {}
+
+impl ValType for Option<ExternRef<'_>> {
+    type Value = u32;
+    /// Marks this value for the postprocessor as an unowned external reference
+    const MARKER: [u8; 4] = *b"EXRr";
+}
+
+impl ResultValType for Option<ExternRef<'_>> {
+    #[inline(always)]
+    unsafe fn unbox(self) -> Self::Value {
+        match self {
+            Some(v) => v.0.get(),
+            None => 0,
         }
     }
 }

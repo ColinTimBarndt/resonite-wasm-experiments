@@ -1,4 +1,4 @@
-use std::iter::repeat;
+use std::{collections::HashMap, fmt::Debug, iter::repeat};
 
 use wasmparser::*;
 
@@ -19,6 +19,42 @@ pub struct ParsedModule<'a> {
     pub data_count: Option<u32>,
     pub data: Box<[Data<'a>]>,
     pub code: Box<[FunctionBody<'a>]>,
+    pub signatures: HashMap<SignatureKey<'a>, &'a [ValueTypeMeta]>,
+}
+
+#[derive(Debug, Hash, PartialEq, Eq)]
+pub enum SignatureKey<'a> {
+    Export(&'a str),
+    Import(&'a str),
+}
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+#[repr(transparent)]
+pub struct ValueTypeMeta {
+    pub tag: [u8; 4],
+}
+
+impl ValueTypeMeta {
+    pub const NONE: Self = Self { tag: [0; 4] };
+    pub const EXTERNREF_OWNED: Self = Self { tag: *b"EXRo" };
+    pub const EXTERNREF_REF: Self = Self { tag: *b"EXRr" };
+
+    pub const fn cast_from_slice(slice: &[[u8; 4]]) -> &[Self] {
+        // SAFETY: ValueTypeMeta is repr(transparent) of [u8; 4]
+        unsafe { std::mem::transmute(slice) }
+    }
+}
+
+impl Debug for ValueTypeMeta {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if *self == Self::NONE {
+            return f.write_str("None");
+        }
+        match std::str::from_utf8(&self.tag) {
+            Ok(s) => Debug::fmt(s, f),
+            Err(_) => Debug::fmt(&self.tag, f),
+        }
+    }
 }
 
 impl<'a> ParsedModule<'a> {
@@ -97,7 +133,33 @@ impl<'a> ParsedModule<'a> {
                 ComponentStartSection { .. } => unimplemented!("Component Model"),
                 ComponentImportSection(_section) => unimplemented!("Component Model"),
                 ComponentExportSection(_section) => unimplemented!("Component Model"),
-                CustomSection(_section) => continue,
+                CustomSection(section) => {
+                    let Some(name) = section.name().strip_prefix("__signature.") else {
+                        continue;
+                    };
+                    let Some((typ, name)) = name.split_once('.') else {
+                        eprintln!("Invalid signature section '{}'", section.name());
+                        continue;
+                    };
+                    let key = match typ {
+                        "import" => SignatureKey::Import(name),
+                        "export" => SignatureKey::Export(name),
+                        _ => {
+                            eprintln!(
+                                "Unknown signature type '{typ}' in section '{}'",
+                                section.name()
+                            );
+                            continue;
+                        }
+                    };
+                    let (metas, []) = section.data().as_chunks::<4>() else {
+                        eprintln!("Section '{}' data is not a multiple of 4", section.name());
+                        continue;
+                    };
+                    module
+                        .signatures
+                        .insert(key, ValueTypeMeta::cast_from_slice(metas));
+                }
                 UnknownSection { .. } => unimplemented!("Unknown Section"),
                 End(_) => break,
                 pl => unimplemented!("{pl:?}"),

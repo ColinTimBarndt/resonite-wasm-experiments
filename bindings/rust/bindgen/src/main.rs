@@ -2,7 +2,7 @@ use std::{error::Error, io::Write};
 
 use clap::Parser;
 
-use crate::imports::{ImportItem, WasmType};
+use crate::imports::{FormatParameterType, FormatResultType, ImportItem, WasmType};
 
 mod args;
 mod imports;
@@ -35,7 +35,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         for (name, item) in items {
             if name.contains("$f") {
                 for instance in [WasmType::F32, WasmType::F64] {
-                    let name = name.replace("$f", instance.typ().unwrap());
+                    let name = name.replace("$f", instance.typ(false).unwrap());
                     write_item(&mut out, &name, &item, Some(&instance))?;
                 }
                 continue;
@@ -77,14 +77,14 @@ fn write_item(
                 if i != 0 {
                     write!(out, ", ")?;
                 }
-                write!(out, "arg{i}: {param}")?;
+                write!(out, "arg{i}: {}", FormatParameterType(param))?;
             }
             write!(out, ")")?;
             if let Some(mut res) = results.first() {
                 if let Some(instance) = instance {
                     res = res.make_instance(instance);
                 }
-                write!(out, " -> {res}")?;
+                write!(out, " -> {}", FormatResultType(res))?;
             }
             writeln!(out, ";")?;
         }

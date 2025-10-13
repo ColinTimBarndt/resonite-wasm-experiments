@@ -22,6 +22,6 @@ fn alot(x: i32) -> (i64, i64, i64) {
 }
 
 #[export_function]
-fn external(object: externref, null: bool) -> externref {
-    if null { externref::NULL } else { object }
+fn external(object: Option<Extern>, null: bool) -> Option<Extern> {
+    if null { None } else { object }
 }

@@ -7,6 +7,7 @@ use wasmparser::Parser;
 use crate::{args::BuildArgs, parse::ParsedModule, weaver::Weaver};
 
 mod args;
+mod binaryen;
 mod cargo;
 mod parse;
 mod type_allocator;
@@ -47,9 +48,11 @@ fn weave(input: PathBuf, output: PathBuf) -> Result<(), Box<dyn Error>> {
     weaver.encode(&mut module)?;
     let module_buf = module.finish();
 
+    //std::fs::write(output, &module_buf[..])?;
     wasmparser::validate(&module_buf)?;
 
-    std::fs::write(output, &module_buf)?;
+    let optimized = binaryen::optimize(&module_buf);
+    std::fs::write(output, optimized)?;
 
     Ok(())
 }

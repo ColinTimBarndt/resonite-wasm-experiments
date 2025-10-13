@@ -49,7 +49,7 @@ impl WasmType {
         }
     }
 
-    pub const fn typ(&self) -> Option<&'static str> {
+    pub const fn typ(&self, is_return: bool) -> Option<&'static str> {
         Some(match self {
             Self::I8 => "i8",
             Self::I16 => "i16",
@@ -58,7 +58,13 @@ impl WasmType {
             Self::F32 => "f32",
             Self::F64 => "f64",
             Self::V128 => "core::arch::wasm32::v128",
-            Self::Externref => "core::ffi::c_void", // TODO
+            Self::Externref => {
+                if is_return {
+                    "crate::Extern"
+                } else {
+                    "crate::ExternRef"
+                }
+            }
             Self::Pointer => "*const core::ffi::c_void",
             Self::PointerMut => "*mut core::ffi::c_void",
             Self::TemplateFloat => return None,
@@ -66,11 +72,18 @@ impl WasmType {
     }
 }
 
-impl Display for WasmType {
+pub struct FormatParameterType<'a>(pub &'a WasmType);
+
+impl Display for FormatParameterType<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self.typ() {
-            Some(typ) => typ,
-            None => return Err(std::fmt::Error),
-        })
+        f.write_str(self.0.typ(false).ok_or(std::fmt::Error)?)
+    }
+}
+
+pub struct FormatResultType<'a>(pub &'a WasmType);
+
+impl Display for FormatResultType<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0.typ(true).ok_or(std::fmt::Error)?)
     }
 }

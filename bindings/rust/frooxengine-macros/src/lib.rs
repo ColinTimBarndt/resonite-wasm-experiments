@@ -1,6 +1,6 @@
 mod parser;
 
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::{Literal, Span, TokenStream};
 use quote::{quote, quote_spanned};
 use unsynn::TokenIter;
 
@@ -85,6 +85,16 @@ pub fn export_function(
         .map(|r| quote! { -> #r })
         .unwrap_or_default();
 
+    let meta_section_name = string_literal(format!("__signature.export.{name}"));
+    let meta_items = args
+        .iter()
+        .map(|(_, ty)| ty)
+        .chain(&return_types)
+        .map(|ty| {
+            quote! { <#ty as ::frooxengine_rs::ValType>::MARKER }
+        });
+    let meta_len = Literal::usize_unsuffixed(args.len() + return_types.len());
+
     quote! {
         #[inline(always)]
         #vis fn #name(#(#args_quote),*) #wrap_returns {
@@ -94,17 +104,17 @@ pub fn export_function(
         mod #mod_name {
             use super::*;
 
-            /// # Safety
-            /// Do not call this function. It is post-processed
-            /// to change the calling convention.
+            #[unsafe(link_section = #meta_section_name)]
+            static META: [u8; 4 * #meta_len] = unsafe { ::core::mem::transmute([#(#meta_items),*]) };
+
             #[unsafe(no_mangle)]
             unsafe extern "C" fn #unspan_name(#(#args_mapped),*) -> ! {
                 let (#ret_vars) = super::#name(#(
-                    unsafe { ::frooxengine_rs::ValType::make_box(#arg_names) }
+                    unsafe { ::frooxengine_rs::ParameterValType::make_box(#arg_names) }
                 ),*);
                 unsafe {
                     __return::#unspan_name(
-                        #(::frooxengine_rs::ValType::unbox(#ret_vars2)),*
+                        #(::frooxengine_rs::ResultValType::unbox(#ret_vars2)),*
                     )
                 }
             }
